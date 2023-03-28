@@ -1,0 +1,1636 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://wechaty.js.org/feed.xml" rel="self" type="application/atom+xml" /><link href="https://wechaty.js.org/" rel="alternate" type="text/html" /><updated>2023-03-28T06:50:48+00:00</updated><id>https://wechaty.js.org/feed.xml</id><title type="html">Wechaty</title><subtitle>Conversational RPA SDK for Chatbot Makers</subtitle><entry><title type="html">考研监督群管 - 考研路上的好帮手</title><link href="https://wechaty.js.org/2023/03/03/postgraduate-supervision-group-assistant/" rel="alternate" type="text/html" title="考研监督群管 - 考研路上的好帮手" /><published>2023-03-03T00:00:00+00:00</published><updated>2023-03-03T00:00:00+00:00</updated><id>https://wechaty.js.org/2023/03/03/postgraduate-supervision-group-assistant</id><content type="html" xml:base="https://wechaty.js.org/2023/03/03/postgraduate-supervision-group-assistant/"><![CDATA[<h2 id="背景">背景</h2>
+
+<p>打算考研了，自发组建了一个考研小组，目前主要是解决管理群聊的功能，每个成员都被要求在群里每日学习打卡，而群管需要进行记录，包括打卡，学习时长计算，缺卡提醒，定时消息通知，以及自动修改每日考研倒计时的标题等等。因此便想到了用wechaty做一个bot机器人管理员。</p>
+
+<h2 id="传统的监督方式">传统的监督方式</h2>
+
+<p>早些时候，我看有些群主或管理员每天都要手动对成员打卡情况进行统计，想下面这样</p>
+
+<p><img src="/assets/2023/03-postgraduate-supervision-group-assistant/image-0.webp" alt="image-0" /></p>
+
+<p>费时又费力，还有每天手动更改考研倒计时的，不仅不够及时准确，而且每天这么设置很是麻烦。<img src="/assets/2023/03-postgraduate-supervision-group-assistant/image-1.webp" alt="image-1" /></p>
+
+<p>向上述所说的那些事情，其实都是一些重复性的劳动，完全可以交给机器人来完成，因此我想到了使用<strong>wechaty</strong>来实现一个考研监督群管的功能。</p>
+
+<h2 id="目前实现的功能">目前实现的功能：</h2>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />定时消息通知</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />定时自动修改群名</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />记录群员打卡</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><del>缺卡提醒</del></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />学习时长计算</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><del>新人欢迎提醒</del></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><del>群员退群提醒</del></li>
+</ul>
+
+<h2 id="打卡格式">打卡格式</h2>
+
+<p>提供两种简易和标准两种场景：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">场景</th>
+      <th style="text-align: left">功能描述</th>
+      <th>说明</th>
+      <th>备注</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">简易</td>
+      <td style="text-align: left">@bot助理 打卡</td>
+      <td>只打卡记录天数，不计算学习时长，表示今日已学习</td>
+      <td>@bot助理 打卡</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">标准</td>
+      <td style="text-align: left">@bot助理 打卡 + 空格 + 时间(单位：h)</td>
+      <td>打卡，并记录学习时长</td>
+      <td>时间单位为h，数字精确到1位小数（四舍五入）</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>示例1：
+@bot助理 打卡</p>
+
+<p>示例2：
+@bot助理 打卡 2.5h</p>
+
+<h2 id="实现的效果">实现的效果：</h2>
+
+<ul>
+  <li>简易版模式</li>
+</ul>
+
+<p><img src="/assets/2023/03-postgraduate-supervision-group-assistant/image-2.webp" alt="image-2" /></p>
+
+<ul>
+  <li>标准版模式</li>
+</ul>
+
+<p><img src="/assets/2023/03-postgraduate-supervision-group-assistant/image-3.webp" alt="image-3" /></p>
+
+<ul>
+  <li>定时提醒以及更新群名“考研倒计时”</li>
+</ul>
+
+<p><img src="/assets/2023/03-postgraduate-supervision-group-assistant/image-4.webp" alt="image-4" /></p>
+
+<p>后续可能会对数据存储进行完善，目前数据量比较小，我是把所有学生的打卡数据记录在一个json文件里，以后可以考虑使用数据库并将操作封装成接口调用的形式。</p>
+
+<p>同时可能会上新一些新的功能，比如当天晚上把学习过的内容发表一个总结出来，第二天由bot在早上进行提醒，以便对前一天所学知识进行巩固，还有缺卡提醒，如果学生连续3天没有进行打卡了，则由bot进行相应的提醒和激励等等。</p>
+
+<p>这个机器人大大方便了我们的日常学习和生活，能让我们节省很多时间，相比其他考研监督群的管理来讲，不用每天手动修改考研倒计时，不用每天用个excel表格记录成员学习打卡情况，能够让我更加专注于考研本身，其他杂七杂八的事情交给机器人处理。最后，2024考研加油吧，今年必上岸，冲冲冲！</p>]]></content><author><name>imooooc</name></author><category term="article" /><category term="chatbot" /><category term="assistant" /><summary type="html"><![CDATA[背景]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wechaty.js.org/assets/2023/03-postgraduate-supervision-group-assistant/cover_title.webp" /><media:content medium="image" url="https://wechaty.js.org/assets/2023/03-postgraduate-supervision-group-assistant/cover_title.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">直击现场:Wechaty在GAIDC开源集市</title><link href="https://wechaty.js.org/2023/02/26/wechaty-in-gaidc/" rel="alternate" type="text/html" title="直击现场:Wechaty在GAIDC开源集市" /><published>2023-02-26T00:00:00+00:00</published><updated>2023-02-26T00:00:00+00:00</updated><id>https://wechaty.js.org/2023/02/26/wechaty-in-gaidc</id><content type="html" xml:base="https://wechaty.js.org/2023/02/26/wechaty-in-gaidc/"><![CDATA[<h2 id="wechaty受邀参加gaidc开源集市现场直击">Wechaty受邀参加GAIDC开源集市现场直击</h2>
+
+<p>周六周日Wechaty社区受邀参加了GAIDC开源集市，现场热闹非凡，有很多小伙伴热情参与Wechaty的互动，让我们来一睹现场情况吧，多图预警</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/12.webp" alt="12.webp" /></p>
+
+<p>首先映入眼帘的是未来科技感满满的展台</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/9.webp" alt="9.webp" /></p>
+
+<p>Wechaty社区人员早早的准备好，等待小伙伴们的到来</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/8.webp" alt="8.webp" /></p>
+
+<p>大会手册对Wechaty的介绍</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/7.webp" alt="7.webp" /></p>
+
+<p>热情的小伙伴们进场了，瞬间把Wechaty的展台挤满了，都是对Wechaty充满兴趣的伙伴。都在掏出手机，迫不及待的尝试用Wechaty开发的ChatGPT BOT</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/13.webp" alt="13.webp" /></p>
+
+<p>很多人对《Chatbot从0到1》感兴趣</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/11.webp" alt="11.webp" /></p>
+
+<p>天选开源人，主办方提供的贴纸被现场小伙伴疯狂争要，但并不是谁都能拿到的，只有深入交流的小伙伴才有机会</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/2.webp" alt="2.webp" /></p>
+
+<p>非常荣幸受邀作为社区代表，在开源开放麦环节来分享Wechaty的内容</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/5.webp" alt="5.webp" /></p>
+
+<p>介绍与Wechaty结缘的第一个项目</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/6.webp" alt="6.webp" /></p>
+
+<p>Wechaty的开发者来自全球各地</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/15.webp" alt="15.webp" /></p>
+
+<p>Wechaty的Contributors卧虎藏龙</p>
+
+<p><img src="/assets/2023/02-wechaty-in-gaidc/14.webp" alt="14.webp" /></p>
+
+<p>火爆全网的chatgpt bot获得8000+Star</p>
+
+<h2 id="wechaty的开源历程">Wechaty的开源历程</h2>
+
+<p>本次开源开放麦活动的PPT分享</p>
+
+<div style="
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top:30px;
+    height:0;
+    overflow:hidden;
+">
+  <iframe src="https://docs.google.com/presentation/d/1g7CsjONxBqZFp1WjWO2yMwlbqIDJ2fCc32ukafsAd2g/edit?usp=sharing" allowfullscreen="" webkitallowfullscreen="" frameborder="0" style="
+      position: absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+    ">
+</iframe>
+
+</div>]]></content><author><name>leochen-g</name></author><category term="announcement" /><category term="news" /><category term="ecosystem" /><category term="wechaty-way" /><summary type="html"><![CDATA[Wechaty受邀参加GAIDC开源集市现场直击]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wechaty.js.org/assets/2023/02-wechaty-in-gaidc/1.webp" /><media:content medium="image" url="https://wechaty.js.org/assets/2023/02-wechaty-in-gaidc/1.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Wechaty受邀参加GAIDC开源集市，邀请你一起来！</title><link href="https://wechaty.js.org/2023/02/23/wechaty-invited-to-gaidc/" rel="alternate" type="text/html" title="Wechaty受邀参加GAIDC开源集市，邀请你一起来！" /><published>2023-02-23T00:00:00+00:00</published><updated>2023-02-23T00:00:00+00:00</updated><id>https://wechaty.js.org/2023/02/23/wechaty-invited-to-gaidc</id><content type="html" xml:base="https://wechaty.js.org/2023/02/23/wechaty-invited-to-gaidc/"><![CDATA[<h2 id="wechaty受邀参加gaidc开源集市邀请你一起来">Wechaty受邀参加GAIDC开源集市邀请你一起来！</h2>
+
+<p>随着专为对话而生的 ChatGPT 火爆，Wechaty 再次成为开源社区里备受关注的项目。</p>
+
+<p>过去 3 个月里，有数十个基于 Wechaty 把 ChatGPT 接入到聊天软件的项目在 GitHub 上开源，最受欢迎的项目已获得 8K+ Stars。</p>
+
+<p><img src="/assets/2023/02-wechaty-invited-to-gaidc/image-1.webp" alt="image-1.webp" /></p>
+
+<p>通过 Wechaty，开发者仅需要 6 行代码就可以把聊天软件变成 Chatbot。增加几行代码就可以接入 ChatGPT、Stable Diffusion 等 AI 模型，获得丰富的对话能力，让聊天软件成为助力创作、提高效率的 AI 工具。</p>
+
+<p>本周末(25日-26日)，Wechaty 受邀参加 GAIDC 开源集市，与更多 AI 项目和开发者一起切磋，共享“AI 狂欢”。</p>
+
+<ul>
+  <li>不管你是萌新的AI小白，想多接触行业的方方面面</li>
+  <li>还是在职开发者，想精进自己的技能，或探索下其他职场可能性</li>
+  <li>或是技术大牛，想从算法-算力-框架多视角下探讨大模型技术前沿应用实践</li>
+  <li>或是科研爱好者，想知晓人工智能如何助力科学研究与发现(AI for science)</li>
+</ul>
+
+<p>这场在临港中心举办的这场开发者先锋大会，一定不要错过！</p>
+
+<p>大会将有多元话题的前沿论坛，诸如AI编程、AI芯片、AI+健康、AI智能出行、AI+机器人、元宇宙等等，为你打开新世界的大门。</p>
+
+<p><img src="/assets/2023/02-wechaty-invited-to-gaidc/image-2.webp" alt="image-2.webp" /></p>
+
+<p>活动现场，还有互动体验区、AI图书展，以及多个热门领域AI企业现场招聘会，鱼和熊掌都能品一品。当然，如果你对万花筒般丰富的开源技术、开源文化感兴趣，不妨也来开源集市瞧瞧！</p>
+
+<h2 id="关于开源集市">关于开源集市</h2>
+
+<p>为了让广大开发者、非技术从业者伙伴们领略多彩的开源文化与项目价值，本次大会特别设立了开源集市专区，邀请15～20 家国内外知名开源社区或相关组织共同参与建设，展示开源魅力、分享社区成果，吸纳更多志同道合的伙伴加入开源的大家庭，一同打怪升级，成长路上相伴而行。</p>
+
+<p>时间：2月25日-26日9:30-17:00</p>
+
+<p>地点：上海市浦东新区海港大道 555 号临港中心 二楼共享大厅（西侧通道2）</p>
+
+<p>值得再三划重点的是，开源集市不止面向技术开发者，也同样欢迎运营、产品、市场伙伴来一起交流切磋！</p>
+
+<h2 id="玩转开源集市">玩转开源集市</h2>
+
+<p>本次集市活动召集了各个前沿技术方向的开源项目，既有用于大厂发起的用于深度图学习的开源框架，也有初创企业致力于解放创造力的新一代编程语言，还有只需 6 行代码，即可将任意聊天软件变成机器人的神奇工具！</p>
+
+<p><img src="/assets/2023/02-wechaty-invited-to-gaidc/image-3.webp" alt="image-3.webp" /></p>
+
+<p>整个集市专区呈长条状，伙伴们入场时，会拿到一份 “集市游玩手册”(类似导览小册子)，介绍20个摊位对应的项目，以及集市专区的游戏玩法说明。</p>
+
+<p>每家社区会为伙伴们准备 1～3 个挑战任务（其中开发者的为技术类实战，非技术背景的朋友则是非coding的问题），顺利通关者可收获一定的“源力”点数，并兑换相应各社区周边礼品。</p>
+
+<p><img src="/assets/2023/02-wechaty-invited-to-gaidc/image-4.webp" alt="image-4.webp" /></p>
+
+<p><img src="/assets/2023/02-wechaty-invited-to-gaidc/image-5.webp" alt="image-5.webp" /></p>
+
+<p>并且，每个摊位每天都有10枚“天选开源人”贴纸（1枚=3个“源力点数”），奖励给来摊位深入交流探讨的伙伴。在集市专区出口处，大家可报上各自收获成果及相应联系方式；活动结束前的半小时再统计一遍，累计点数最多的，收获价值感满满的盲盒大礼盒（价值150～1000元不等），奖品信息拭目以待！</p>
+
+<h2 id="特色环节">特色环节</h2>
+
+<p>为了尽可能丰富大家体验、加深对真实开源的理解，本次集市专区还有两大特色环节：</p>
+
+<h3 id="1-开源团聚环节">1. 开源团聚环节</h3>
+
+<p>25日下午13:30-17:00有组织2～3场团聚（每场60～90min），组局者有充分的自由度自发挥，可以是恳谈会、吐槽会、圆桌、工作坊等多元形式，话题也可以跳脱纯技术本身尽可能拓展延伸，大会官网也可同步信息，尽快和大家同步！</p>
+
+<p><img src="/assets/2023/02-wechaty-invited-to-gaidc/image-6.webp" alt="image-6.webp" /></p>
+
+<h3 id="2-开源开放麦">2. 开源开放麦</h3>
+
+<p>26号下午 13:00-15:00 在小舞台区域（离集市专区步行1～2min），各项目代表也会受邀上舞台，分享各自项目的建立初衷、发展状况和未来愿景等等，每家 5～6min 闪电演讲的时间，大家也别错过哦！</p>
+
+<p><img src="/assets/2023/02-wechaty-invited-to-gaidc/image-7.webp" alt="image-7.webp" /></p>
+
+<p><img src="/assets/2023/02-wechaty-invited-to-gaidc/image-8.webp" alt="image-8.webp" /></p>
+
+<h2 id="报名方式">报名方式</h2>
+
+<p>点击<a href="https://www.globalaidc.com/event/zh/pc/e80e0000-06d7-0e04-797b-08daf2220682/apply?attendeeTypeId=e80e0000-06d7-0e04-4a0c-08daf229e183&amp;groupOrganizationCode=YYW260">报名链接</a>注册后即可报名。活动当天，会有 Wechaty 社区的伙伴在现场与大家互动，欢迎社区的开发者们前来“面基”</p>
+
+<h2 id="gaidc-峰会背景">GAIDC 峰会背景</h2>
+
+<p>由世界人工智能大会组委会、上海市经济和信息化委员会、上海市人才工作领导小组办公室、中国（上海）自由贸易试验区临港新片区管理委员会共同指导，上海市人工智能行业协会和上海临港经济发展（集团）有限公司共同主办的2023全球人工智能开发者先锋大会（GAIDC）将于2023年2月25日—26日在上海举行。</p>
+
+<p>GAIDC始于WAIC上海人工智能开发者大会，历经三年发展沉淀，全面迭代升级。本届大会主题为“向光而行的AI开发者”，以AI开发者为核心，为AI开发者带来产业之光、科技之光、未来之光。大会在上海最早迎接日出的地方——临港，通过论坛、团聚、学习赛、项目路演、人才交流、书友会、互动体验等多个板块，聚焦专业前沿内容，联合超过20家国内外开源组织、开发者社区，力邀全球技术大牛、导师大咖和AI开发者共同线下参与，同时与上千万专业开发者线上互动交流，营造自由活泼氛围。</p>]]></content><author><name>juzibot</name></author><category term="announcement" /><category term="news" /><category term="ecosystem" /><category term="wechaty-way" /><summary type="html"><![CDATA[Wechaty受邀参加GAIDC开源集市邀请你一起来！]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wechaty.js.org/assets/2023/02-wechaty-invited-to-gaidc/2023-gaidc.webp" /><media:content medium="image" url="https://wechaty.js.org/assets/2023/02-wechaty-invited-to-gaidc/2023-gaidc.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">使用wechaty与Flask搭建消息通知服务</title><link href="https://wechaty.js.org/2023/02/18/wechaty-flask-service/" rel="alternate" type="text/html" title="使用wechaty与Flask搭建消息通知服务" /><published>2023-02-18T00:00:00+00:00</published><updated>2023-02-18T00:00:00+00:00</updated><id>https://wechaty.js.org/2023/02/18/wechaty-flask-service</id><content type="html" xml:base="https://wechaty.js.org/2023/02/18/wechaty-flask-service/"><![CDATA[<p><a href="https://wechaty.js.org"><img src="https://img.shields.io/badge/Powered%20By-Wechaty-green.svg" alt="Powered by Wechaty" /></a>
+<a href="https://wechaty.js.org/docs/contributor-program"><img src="https://img.shields.io/badge/Wechaty-Contributor%20Program-green.svg" alt="Wechaty Contributor Program" /></a>
+<a href="https://github.com/juzibot/Welcome/wiki/Everything-about-Wechaty/"><img src="https://img.shields.io/badge/Wechaty%20Contributor%20Program-Juzi.BOT-orange.svg" alt="Juzi.BOT Developer Program" /></a></p>
+
+<blockquote>
+  <p>作者: <a href="https://github.com/Houruirui">Houruirui</a>，代码爱好者。</p>
+</blockquote>
+
+<p><a href="https://github.com/Houruirui/wechaty-flask">Wechaty-Flask-Service</a></p>
+
+<!-- more -->
+
+<p>目前，市面上有各种各样的接口提供了消息推送，比如钉钉，spark， IFTTT， telegram等等. 但是，每个人手机里各种各样的消息推送常常让人应接不暇。而微信，作为最广泛使用的聊天工具，鲜有人错过阅读微信消息。 所以，最方便的还是通过微信机器人来进行消息推送。</p>
+
+<p>通过搜索，了解到目前市场的消息机器人有itchat， wxpy，wechaty等等。可是随着腾讯施加压力，基于web微信的itchat和wxpy无法使用。而wechaty支持多种协议，比web协议更加安全，于是决定采用wechaty基于ipad协议 ( padLocal ) 来搭建机器人。但是，在实际的应用当中，而且wechaty是通过消息回调的形式实现的，这样的情况下，就没有办法让机器人主动发消息，还有一个问题是可能你有很多个应用都需要使用微信通知，但是一个Token只能供一个微信账号使用，那怎么样才能让多个服务都通过这一个微信来发通知呢？对于这两个问题，我想到的办法首先自己实现初始化机器人，在完成初始化后直接返回机器人而不让机器人进入消息监听循环，从而主动控制机器人收发消息；在多服务的场景下，用flask建立后端服务，维护初始化好的机器人，这样不同的业务可以直接向后端发起请求而实现消息通知。</p>
+
+<p>让我们进入正题！</p>
+
+<h2 id="环境和依赖">环境和依赖</h2>
+
+<p>python
+aioflask
+asyncio</p>
+
+<h2 id="wechaty-puppet-hostie部署">Wechaty Puppet Hostie部署：</h2>
+
+<p>因为原生的wechaty是基于JavaScript和TypeScript写的，所以需要通过docker搭建Wechaty Puppet Hostie 服务作为中转， 从而可以通过python调用。</p>
+
+<ul>
+  <li><strong>部署前置准备:</strong></li>
+</ul>
+
+<p>一个满足以下三点要求的服务器：</p>
+
+<blockquote>
+  <p>Public IP
+Public Port
+Docker</p>
+</blockquote>
+
+<ul>
+  <li><strong>部署Wechaty Puppet Hostie</strong></li>
+</ul>
+
+<p>具体代码如下（本人服务器为 Ununtu 18.04）</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#! /usr/bin/bash</span>
+
+<span class="nb">export </span><span class="nv">WECHATY_LOG</span><span class="o">=</span><span class="s2">"verbose"</span>
+<span class="nb">export </span><span class="nv">WECHATY_PUPPET</span><span class="o">=</span><span class="s2">"wechaty-puppet-padlocal"</span>
+<span class="nb">export </span><span class="nv">WECHATY_PUPPET_PADLOCAL_TOKEN</span><span class="o">=</span><span class="s2">"puppet_padlocal__TOKEN__"</span>
+
+<span class="nb">export </span><span class="nv">WECHATY_PUPPET_SERVER_PORT</span><span class="o">=</span><span class="s2">"9001"</span>
+<span class="nb">export </span><span class="nv">WECHATY_TOKEN</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://www.uuidgenerator.net/api/version4<span class="si">)</span>
+  <span class="nt">--name</span> wechaty_puppet_service_token_gateway <span class="se">\</span>
+  <span class="nt">--rm</span> <span class="se">\</span>
+  <span class="nt">-e</span> WECHATY_LOG <span class="se">\</span>
+  <span class="nt">-e</span> WECHATY_PUPPET <span class="se">\</span>
+  <span class="nt">-e</span> WECHATY_PUPPET_PADLOCAL_TOKEN <span class="se">\</span>
+  <span class="nt">-e</span> WECHATY_PUPPET_SERVER_PORT <span class="se">\</span>
+  <span class="nt">-e</span> WECHATY_TOKEN <span class="se">\</span>
+  <span class="nt">-p</span> <span class="s2">"</span><span class="nv">$WECHATY_PUPPET_SERVER_PORT</span><span class="s2">:</span><span class="nv">$WECHATY_PUPPET_SERVER_PORT</span><span class="s2">"</span> <span class="se">\</span>
+  wechaty/wechaty
+</code></pre></div></div>
+
+<p>代码中的WECHATY_PUPPET_PADLOCAL_TOKEN是需要向官方申请，可以得到的一个可以试用7天的token，后续通过社区的激励计划，还可以免费获得时效更长的token。<a href="https://wechaty.js.org/docs/contributor-program/">详情参见这里</a>。</p>
+
+<ul>
+  <li><strong>验证Wechaty Puppet Hostie</strong></li>
+</ul>
+
+<p>访问 <a href="https://api.chatie.io/v0/hosties/WECHATY_TOKEN">https://api.chatie.io/v0/hosties/WECHATY_TOKEN</a>, 其中WECHATY_TOKEN是指你刚刚自行设定的Token，当返回结果为服务器的Public IP时则说明部署成功，为0.0.0.0时则说明部署失败~</p>
+
+<h2 id="项目思路">项目思路</h2>
+
+<p>关于机器人方面，我读了官方examples里面的代码发现机器人都是继承Wechaty基类来通过自定义回调函数来实现各种功能。利用事件驱动的回调函数这样是很被动的，而我想得到一个可直接调用的Wechaty对象，不通过start()函数进入事件循环监听, 而可以主动的发送信息。经过一天的阅读代码和自我摸索，终于实现了创建一个可以直接调用的机器人对象，稍后请参考详细代码，其中最重要的还是需要进入事件监听，然后在监听到成功登录的事件以后，中断监听，返回已经登录好的机器人对象， 从而实现直接调用。</p>
+
+<p>首先我们初始化机器人对象，我是想把消息通知发送到群聊当中，在使用过程中发现，在初始化好机器人后并没有加载好微信群，所以我们需要先用官方提供的examples来获取到微信群的id，然后手动加载微信群。同时，我还发现如果同步的发送消息，flask需要5-10s才能处理完请求，所以在这里我使用了用线程处理不同的请求，实现了消息的并发。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">aioflask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="kn">from</span> <span class="n">aioflask</span> <span class="kn">import</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="n">Config</span> <span class="kn">import</span> <span class="n">WECHAT_SEVER_CONFIG</span>
+<span class="kn">import</span> <span class="n">concurrent.futures</span>
+<span class="kn">from</span> <span class="n">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="kn">import</span> <span class="n">threading</span>
+<span class="kn">import</span> <span class="n">itertools</span>
+
+<span class="kn">from</span> <span class="n">wechaty</span> <span class="kn">import</span> <span class="n">Wechaty</span><span class="p">,</span> <span class="n">Message</span><span class="p">,</span> <span class="n">WechatyPlugin</span><span class="p">,</span> <span class="n">Room</span><span class="p">,</span> <span class="n">WechatyOptions</span>
+<span class="kn">from</span> <span class="n">wechaty_puppet</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="n">os</span>
+<span class="kn">import</span> <span class="n">asyncio</span>
+<span class="kn">import</span> <span class="n">json</span>
+<span class="kn">import</span> <span class="n">traceback</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="nc">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="n">WECHATY_PUPPET_SERVICE_TOKEN</span> <span class="o">=</span> <span class="s">''</span>
+<span class="n">WECHATY_PUPPET</span> <span class="o">=</span> <span class="s">'wechaty-puppet-service'</span>
+
+<span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'WECHATY_PUPPET_SERVICE_TOKEN'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WECHATY_PUPPET_SERVICE_TOKEN</span>
+<span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'WECHATY_PUPPET'</span><span class="p">]</span> <span class="o">=</span> <span class="n">WECHATY_PUPPET</span>
+<span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'WECHATY_PUPPET_SERVICE_ENDPOINT'</span><span class="p">]</span> <span class="o">=</span> <span class="s">"0.0.0.0:9001"</span>
+
+<span class="k">class</span> <span class="nc">WechatBot</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="nf">print</span><span class="p">(</span><span class="s">"need to Init wechat bot!"</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">:</span> <span class="n">Wechaty</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">asyncio</span><span class="p">.</span><span class="nf">get_event_loop</span><span class="p">().</span><span class="nf">run_until_complete</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nf">init_wechat_bot</span><span class="p">())</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">init_wechat_bot</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="n">puppet_options</span> <span class="o">=</span> <span class="nc">PuppetOptions</span><span class="p">()</span>
+        <span class="n">puppet_options</span><span class="p">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">WECHATY_PUPPET_SERVICE_TOKEN</span>
+
+        <span class="n">options</span> <span class="o">=</span> <span class="nc">WechatyOptions</span><span class="p">()</span>
+        <span class="c1"># options.name = self.my_wechat_id
+</span>        <span class="n">options</span><span class="p">.</span><span class="n">puppet</span> <span class="o">=</span> <span class="n">WECHATY_PUPPET</span>
+        <span class="n">options</span><span class="p">.</span><span class="n">puppet_options</span> <span class="o">=</span> <span class="n">puppet_options</span>
+
+        <span class="n">self</span><span class="p">.</span><span class="n">bot</span> <span class="o">=</span> <span class="nc">Wechaty</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="nf">init_puppet</span><span class="p">()</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="nf">init_puppet_event_bridge</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="nf">_init_puppet</span><span class="p">()</span>
+        <span class="c1"># await self.bot.puppet.logout()
+</span>        <span class="c1"># print(self.bot.puppet.login_user_id)
+</span>        <span class="k">async</span> <span class="k">for</span> <span class="n">response</span> <span class="ow">in</span> <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">puppet_stub</span><span class="p">.</span><span class="nf">event</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">payload_data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">json</span><span class="p">.</span><span class="nf">loads</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">payload</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_SCAN</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive scan info,'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="c1"># create qr_code
+</span>                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventScanPayload</span><span class="p">(</span>
+                        <span class="n">status</span><span class="o">=</span><span class="nc">ScanStatus</span><span class="p">(</span><span class="n">payload_data</span><span class="p">[</span><span class="s">'status'</span><span class="p">]),</span>
+                        <span class="n">qrcode</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'qrcode'</span><span class="p">,</span> <span class="bp">None</span><span class="p">),</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'data'</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'scan payload_data'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'scan'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_LOGIN</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive login info '</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="c1"># print('login payload_data', payload_data)
+</span>                    <span class="n">event_login_payload</span> <span class="o">=</span> <span class="nc">EventLoginPayload</span><span class="p">(</span>
+                        <span class="n">contact_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">[</span><span class="s">'contactId'</span><span class="p">])</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">login_user_id</span> <span class="o">=</span> <span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'contactId'</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'login'</span><span class="p">,</span> <span class="n">event_login_payload</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_READY</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive ready info '</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventReadyPayload</span><span class="p">(</span><span class="o">**</span><span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'ready'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_ROOM_TOPIC</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive room-topic info &lt;%s&gt;'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventRoomTopicPayload</span><span class="p">(</span>
+                        <span class="n">changer_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'changerId'</span><span class="p">),</span>
+                        <span class="n">new_topic</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'newTopic'</span><span class="p">),</span>
+                        <span class="n">old_topic</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'oldTopic'</span><span class="p">),</span>
+                        <span class="n">room_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'roomId'</span><span class="p">),</span>
+                        <span class="n">timestamp</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'timestamp'</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'room-topic'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_DONG</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive dong info &lt;%s&gt;'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventDongPayload</span><span class="p">(</span><span class="o">**</span><span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'dong'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_MESSAGE</span><span class="p">):</span>
+                    <span class="c1"># payload = get_message_payload_from_response(response)
+</span>                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive message info &lt;%s&gt;'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">event_message_payload</span> <span class="o">=</span> <span class="nc">EventMessagePayload</span><span class="p">(</span>
+                        <span class="n">message_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">[</span><span class="s">'messageId'</span><span class="p">])</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'message'</span><span class="p">,</span> <span class="n">event_message_payload</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_HEARTBEAT</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive heartbeat info &lt;%s&gt;'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="c1"># Huan(202005) FIXME:
+</span>                    <span class="c1">#   https://github.com/wechaty/python-wechaty-puppet/issues/6
+</span>                    <span class="c1">#   Workaround for unexpected server json payload key: timeout
+</span>                    <span class="c1"># if 'timeout' in payload_data:
+</span>                    <span class="c1">#     del payload_data['timeout']
+</span>                    <span class="n">payload_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">'data'</span><span class="p">:</span> <span class="n">payload_data</span><span class="p">[</span><span class="s">'data'</span><span class="p">]}</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventHeartbeatPayload</span><span class="p">(</span><span class="o">**</span><span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'heartbeat'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_ERROR</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive error info &lt;%s&gt;'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventErrorPayload</span><span class="p">(</span><span class="o">**</span><span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'error'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_FRIENDSHIP</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive friendship info &lt;%s&gt;'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventFriendshipPayload</span><span class="p">(</span>
+                        <span class="n">friendship_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'friendshipId'</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'friendship'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_ROOM_JOIN</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive room-join info &lt;%s&gt;'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventRoomJoinPayload</span><span class="p">(</span>
+                        <span class="n">invited_ids</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'inviteeIdList'</span><span class="p">,</span> <span class="p">[]),</span>
+                        <span class="n">inviter_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'inviterId'</span><span class="p">),</span>
+                        <span class="n">room_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'roomId'</span><span class="p">),</span>
+                        <span class="n">timestamp</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'timestamp'</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'room-join'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_ROOM_INVITE</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive room-invite info &lt;%s&gt;'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventRoomInvitePayload</span><span class="p">(</span>
+                        <span class="n">room_invitation_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span>
+                            <span class="s">'roomInvitationId'</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'room-invite'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_ROOM_LEAVE</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive room-leave info &lt;%s&gt;'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventRoomLeavePayload</span><span class="p">(</span>
+                        <span class="n">removed_ids</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'removeeIdList'</span><span class="p">,</span> <span class="p">[]),</span>
+                        <span class="n">remover_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'removerId'</span><span class="p">),</span>
+                        <span class="n">room_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'roomId'</span><span class="p">),</span>
+                        <span class="n">timestamp</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'timestamp'</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'room-leave'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_LOGOUT</span><span class="p">):</span>
+                    <span class="nf">print</span><span class="p">(</span><span class="s">'receive logout info &lt;%s&gt;'</span><span class="p">,</span> <span class="n">payload_data</span><span class="p">)</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="nc">EventLogoutPayload</span><span class="p">(</span>
+                        <span class="n">contact_id</span><span class="o">=</span><span class="n">payload_data</span><span class="p">[</span><span class="s">'contactId'</span><span class="p">],</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">payload_data</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s">'data'</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">login_user_id</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">puppet</span><span class="p">.</span><span class="n">_event_stream</span><span class="p">.</span><span class="nf">emit</span><span class="p">(</span><span class="s">'logout'</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">response</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="nf">int</span><span class="p">(</span><span class="n">EventType</span><span class="p">.</span><span class="n">EVENT_TYPE_UNSPECIFIED</span><span class="p">):</span>
+                    <span class="k">pass</span>
+        <span class="k">for</span> <span class="n">room_name</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">ROOMS</span><span class="p">.</span><span class="nf">items</span><span class="p">():</span>
+            <span class="n">room</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">bot</span><span class="p">.</span><span class="n">Room</span><span class="p">.</span><span class="nf">load</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">await</span> <span class="n">room</span><span class="p">.</span><span class="nf">ready</span><span class="p">()</span>
+            <span class="n">ROOMS</span><span class="p">[</span><span class="n">room_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">room</span>
+            <span class="nf">print</span><span class="p">(</span><span class="n">room_name</span><span class="p">,</span> <span class="s">"ready!"</span><span class="p">,</span> <span class="n">room</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="n">ROOMS</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">EventLoopThread</span><span class="p">(</span><span class="n">threading</span><span class="p">.</span><span class="n">Thread</span><span class="p">):</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">_count</span> <span class="o">=</span> <span class="n">itertools</span><span class="p">.</span><span class="nf">count</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">started</span> <span class="o">=</span> <span class="n">threading</span><span class="p">.</span><span class="nc">Event</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="nf">type</span><span class="p">(</span><span class="n">self</span><span class="p">).</span><span class="n">__name__</span><span class="si">}</span><span class="s">-</span><span class="si">{</span><span class="nf">next</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">_count</span><span class="p">)</span><span class="si">}</span><span class="s">"</span>
+        <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="n">loop</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">loop</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">loop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">loop</span><span class="p">.</span><span class="nf">is_running</span><span class="p">(),</span> <span class="n">loop</span><span class="p">.</span><span class="nf">is_closed</span><span class="p">(),</span> <span class="n">loop</span><span class="p">.</span><span class="nf">get_debug</span><span class="p">()</span>
+        <span class="nf">return </span><span class="p">(</span>
+            <span class="sa">f</span><span class="s">"&lt;</span><span class="si">{</span><span class="nf">type</span><span class="p">(</span><span class="n">self</span><span class="p">).</span><span class="n">__name__</span><span class="si">}</span><span class="s"> </span><span class="si">{</span><span class="n">self</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s"> id=</span><span class="si">{</span><span class="n">self</span><span class="p">.</span><span class="n">ident</span><span class="si">}</span><span class="s"> "</span>
+            <span class="sa">f</span><span class="s">"running=</span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s"> closed=</span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s"> debug=</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s">&gt;"</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">loop</span> <span class="o">=</span> <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="p">.</span><span class="nf">new_event_loop</span><span class="p">()</span>
+        <span class="n">asyncio</span><span class="p">.</span><span class="nf">set_event_loop</span><span class="p">(</span><span class="n">loop</span><span class="p">)</span>
+        <span class="n">loop</span><span class="p">.</span><span class="nf">call_later</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">started</span><span class="p">.</span><span class="nb">set</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">loop</span><span class="p">.</span><span class="nf">run_forever</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">shutdown_asyncgens</span> <span class="o">=</span> <span class="n">loop</span><span class="p">.</span><span class="nf">shutdown_asyncgens</span><span class="p">()</span>
+            <span class="k">except</span> <span class="nb">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">loop</span><span class="p">.</span><span class="nf">run_until_complete</span><span class="p">(</span><span class="n">shutdown_asyncgens</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">shutdown_executor</span> <span class="o">=</span> <span class="n">loop</span><span class="p">.</span><span class="nf">shutdown_default_executor</span><span class="p">()</span>
+            <span class="k">except</span> <span class="nb">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">loop</span><span class="p">.</span><span class="nf">run_until_complete</span><span class="p">(</span><span class="n">shutdown_executor</span><span class="p">)</span>
+            <span class="n">asyncio</span><span class="p">.</span><span class="nf">set_event_loop</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+            <span class="n">loop</span><span class="p">.</span><span class="nf">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="n">loop</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">loop</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">loop</span><span class="p">,</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">loop</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">loop</span><span class="p">.</span><span class="nf">call_soon_threadsafe</span><span class="p">(</span><span class="n">loop</span><span class="p">.</span><span class="n">stop</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="nf">join</span><span class="p">()</span>
+
+
+<span class="n">_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="p">.</span><span class="nc">Lock</span><span class="p">()</span>
+<span class="n">_loop_thread</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+<span class="k">def</span> <span class="nf">get_event_loop</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">_loop_thread</span>
+
+    <span class="k">if</span> <span class="n">_loop_thread</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_loop_thread</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">_loop_thread</span> <span class="o">=</span> <span class="nc">EventLoopThread</span><span class="p">()</span>
+                <span class="n">_loop_thread</span><span class="p">.</span><span class="nf">start</span><span class="p">()</span>
+                <span class="c1"># give the thread up to a second to produce a loop
+</span>                <span class="n">_loop_thread</span><span class="p">.</span><span class="n">started</span><span class="p">.</span><span class="nf">wait</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_loop_thread</span><span class="p">.</span><span class="n">loop</span>
+
+
+<span class="k">def</span> <span class="nf">stop_event_loop</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">_loop_thread</span>
+    <span class="k">with</span> <span class="n">_lock</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_loop_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">_loop_thread</span><span class="p">.</span><span class="nf">stop</span><span class="p">()</span>
+            <span class="n">_loop_thread</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+<span class="k">def</span> <span class="nf">run_coroutine</span><span class="p">(</span><span class="n">coro</span><span class="p">):</span>
+    <span class="s">"""Run the coroutine in the event loop running in a separate thread
+
+    Returns a Future, call Future.result() to get the output
+
+    """</span>
+    <span class="k">return</span> <span class="n">asyncio</span><span class="p">.</span><span class="nf">run_coroutine_threadsafe</span><span class="p">(</span><span class="n">coro</span><span class="p">,</span> <span class="nf">get_event_loop</span><span class="p">())</span>
+
+
+
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">send_wechat_message</span><span class="p">(</span><span class="n">room_str</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">ROOMS</span>
+    <span class="n">room</span> <span class="o">=</span> <span class="n">ROOMS</span><span class="p">[</span><span class="n">room_str</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">room</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">room</span><span class="p">.</span><span class="nf">say</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s">'/sendmessage'</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s">'POST'</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">send_message</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">request</span><span class="p">.</span><span class="n">json</span>
+        <span class="k">if</span> <span class="n">res</span><span class="p">:</span>
+            <span class="n">room_str</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s">'room'</span><span class="p">]</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s">'message'</span><span class="p">]</span>
+            <span class="n">asyncio</span><span class="p">.</span><span class="nf">create_task</span><span class="p">(</span><span class="nf">send_wechat_message</span><span class="p">(</span><span class="n">room_str</span><span class="p">,</span> <span class="n">message</span><span class="p">))</span>
+            <span class="k">return</span> <span class="s">"success"</span>
+    <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="s">"send msg fail, error:"</span><span class="p">,</span> <span class="n">traceback</span><span class="p">.</span><span class="nf">format_exc</span><span class="p">())</span>
+    <span class="k">return</span> <span class="s">'fail'</span>
+
+<span class="c1"># 你需要发送通知的群聊，需要使用官方example提前获取
+</span><span class="n">ROOMS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">"快乐一家人"</span><span class="p">:</span> <span class="p">[</span><span class="s">"1111111111111@chatroom"</span><span class="p">,</span> <span class="bp">None</span><span class="p">],</span>
+    <span class="s">"父老乡亲"</span><span class="p">:</span> <span class="p">[</span><span class="s">"222222222@chatroom"</span><span class="p">,</span> <span class="bp">None</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="p">.</span><span class="nf">get_event_loop</span><span class="p">()</span>
+    <span class="n">asyncio</span><span class="p">.</span><span class="nf">set_event_loop</span><span class="p">(</span><span class="n">loop</span><span class="p">)</span>
+    <span class="n">bot</span> <span class="o">=</span> <span class="nc">WechatBot</span><span class="p">()</span>
+    <span class="n">app</span><span class="p">.</span><span class="nf">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s">'0.0.0.0'</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="s">"9999"</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>至此我们的基本框架已经搭好，大家可以通过本例的基础代码实现更复杂的工程。</p>
+
+<h2 id="感谢">感谢</h2>
+
+<p>在最后我们要感谢所有为我们提供工具和服务的团队和个人。特别感谢开源项目<a href="https://github.com/wechaty/wechaty">Wechaty</a>团队和免费提供服务的padLocal团队。</p>]]></content><author><name>houruirui</name></author><category term="project" /><category term="productivity" /><summary type="html"><![CDATA[]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wechaty.js.org/assets/2023/02-wechaty-flask-service/wechaty.webp" /><media:content medium="image" url="https://wechaty.js.org/assets/2023/02-wechaty-flask-service/wechaty.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Wechaty Puppet Service WorkPro 迁移指南</title><link href="https://wechaty.js.org/2023/01/18/workpro-immigration-guide/" rel="alternate" type="text/html" title="Wechaty Puppet Service WorkPro 迁移指南" /><published>2023-01-18T00:00:00+00:00</published><updated>2023-01-18T00:00:00+00:00</updated><id>https://wechaty.js.org/2023/01/18/workpro-immigration-guide</id><content type="html" xml:base="https://wechaty.js.org/2023/01/18/workpro-immigration-guide/"><![CDATA[<h2 id="前言">前言</h2>
+
+<p>这一迁移指南主要针对 Node Wechaty 用户。对于其他版本的 Wechaty 使用中出现的问题，请首先将对应的 Wechaty 包版本升级到最新，然后再尝试。如果有报错信息，可以提供给我们看看能否兼容（但无法保证），或是在对应包的 repo 中提 issue。</p>
+
+<h2 id="迁移之前">迁移之前</h2>
+
+<p>先通过 <code class="language-plaintext highlighter-rouge">npm ls wechaty</code> <code class="language-plaintext highlighter-rouge">npm ls wechaty-wechaty-puppet</code> 和 <code class="language-plaintext highlighter-rouge">npm ls wechaty-puppet-service</code> 来查看所使用的核心包的版本。如果使用版本是 0.x ，请升级到最新版。尤其需要注意的是，<code class="language-plaintext highlighter-rouge">wechaty-puppet-service</code> 的版本需要高于 1.19.9 ，否则会在触发标签、群公告等事件时造成卡死。具体请参考这个 <a href="https://github.com/wechaty/puppet-service/issues/216">issue</a> 。</p>
+
+<h2 id="迁移代码">迁移代码</h2>
+
+<p>在升级到 wechaty 1.x 包的过程中，代码需要进行一定的修改。参考：<a href="https://juzihudong.feishu.cn/docx/PCL2dg0yjoDBkOxNlC9cb1H7nkg">Wechaty 1.0 迁移</a>。</p>
+
+<h2 id="获取-token">获取 token</h2>
+
+<p>根据已有的 token 联系售后客服，可以获取到一个新旧 token 的映射表（一般为 csv 格式），登录账号、到期时间等各种信息都可以继承。正常情况下会在新的 token 上自动登录上原账号，但由于登录环境发生了变化，也有一定概率会掉线需要扫码（概率很低）。</p>
+
+<h2 id="使用新-token-的注意事项">使用新 token 的注意事项</h2>
+
+<ul>
+  <li>禁用 tls 连接，原因请参考这个 <a href="https://github.com/wechaty/puppet-service/issues/160">issue</a>。可以在代码中禁用，也可以通过环境变量。
+    <ul>
+      <li>代码：在 <code class="language-plaintext highlighter-rouge">puppetOptions中加入tls: { disable: true }</code></li>
+      <li>环境变量：<code class="language-plaintext highlighter-rouge">WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT=true</code></li>
+    </ul>
+  </li>
+  <li>注意与 token 断开后重连。目前 WorkPro 处于新上线阶段，各种升级和修复情况较多。我们一般会在晚上12点左右进行服务更新。目前会较为频繁，稳定后预计一周一次，但总归是无法避免的。更新时账号会离线1分钟左右。由于目前社区版的 wechaty 重连功能不很稳定，建议在外部使用一些额外的代码进行在线状态检查，并尝试重连或重启。</li>
+</ul>
+
+<h2 id="体验版与社区版的功能差异">体验版与社区版的功能差异</h2>
+
+<p>在 <a href="https://wechaty.js.org/2022/12/23/introducing-workpro-puppet/">WorkPro 发布博客</a> 中可以看到，有一些功能被标注为依赖体验版 Wechaty 。所谓体验版 Wechaty，指的是 @juzi scope下的 Wechaty 相关包，里面包含了一些尚未在社区版上线的新功能。</p>
+
+<p>需要注意的是，尽管我们会尽力推动体验版的功能向社区版合并，并且也会尽量保证兼容性，但无法保证百分之百的功能都能合并入社区版，并且与体验版的参数、回调、返回值等各方面一致。
+体验版独有的功能包括（如果有需求，可以再写文档）：</p>
+
+<ul>
+  <li>新的 Wechaty 层事件</li>
+</ul>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="nx">update</span>               <span class="p">:</span> <span class="dl">'</span><span class="s1">Will be emitted when some info has been changed.</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">contact-tag-add</span><span class="dl">'</span>    <span class="p">:</span> <span class="dl">'</span><span class="s1">Will be emitted when contact has new tags.</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">contact-tag-remove</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">Will be emitted when contact has some tags removed.</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">contact-name</span><span class="dl">'</span>       <span class="p">:</span> <span class="dl">'</span><span class="s1">Will be emitted when contact name has been changed.</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">contact-alias</span><span class="dl">'</span>      <span class="p">:</span> <span class="dl">'</span><span class="s1">Will be emitted when contact alias has been changed.</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">contact-phone</span><span class="dl">'</span>      <span class="p">:</span> <span class="dl">'</span><span class="s1">Will be emitted when contact phone has been changed.</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">contact-description</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Will be emitted when contact description has been changed.</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">contact-corporation</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Will be emitted when contact corporation has been changed.</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">room-owner</span><span class="dl">'</span>         <span class="p">:</span> <span class="dl">'</span><span class="s1">Will be emitted when room owner has been changed.</span><span class="dl">'</span><span class="p">,</span>
+</code></pre></div></div>
+
+<ul>
+  <li>新的 Puppet 层事件</li>
+</ul>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="dl">'</span><span class="s1">room-announce</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">new room announcement received</span><span class="dl">'</span><span class="p">,</span>
+  <span class="nx">tag</span>            <span class="p">:</span> <span class="dl">'</span><span class="s1">tag created, deleted or changed</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">tag-group</span><span class="dl">'</span>    <span class="p">:</span> <span class="dl">'</span><span class="s1">tag group created, deleted or changed</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">post-comment</span><span class="dl">'</span> <span class="p">:</span> <span class="dl">'</span><span class="s1">a post receives a new comment</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">post-tap</span><span class="dl">'</span>     <span class="p">:</span> <span class="dl">'</span><span class="s1">a post receives a new tap</span><span class="dl">'</span><span class="p">,</span>
+</code></pre></div></div>
+
+<ul>
+  <li>朋友圈功能（发布、点赞、回复）</li>
+  <li>标签功能（列表、打标签）</li>
+  <li>改进了重连机制（需要在 errorListener 中监听’no grpc manager’关键字并重启 bot ）</li>
+  <li>会话已读功能</li>
+  <li>发送接收视频号消息、位置消息功能</li>
+  <li>系统消息</li>
+</ul>]]></content><author><name>wang-nan</name></author><category term="tutorial" /><category term="news" /><category term="puppet-service" /><category term="puppet-provider" /><category term="workpro" /><category term="wxwork" /><summary type="html"><![CDATA[前言]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wechaty.js.org/assets/2023/01-workpro-immigration-guide/workpro.webp" /><media:content medium="image" url="https://wechaty.js.org/assets/2023/01-workpro-immigration-guide/workpro.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Wechaty Puppet Service WorkPro 发布公告</title><link href="https://wechaty.js.org/2022/12/23/introducing-workpro-puppet/" rel="alternate" type="text/html" title="Wechaty Puppet Service WorkPro 发布公告" /><published>2022-12-23T00:00:00+00:00</published><updated>2022-12-23T00:00:00+00:00</updated><id>https://wechaty.js.org/2022/12/23/introducing-workpro-puppet</id><content type="html" xml:base="https://wechaty.js.org/2022/12/23/introducing-workpro-puppet/"><![CDATA[<p>经过长期的筹备与开发， WxWork 的继任者 WorkPro 作为 Wechaty 社区新的 Puppet Service 如今正式进入 beta 测试阶段了！欢迎社区的小伙伴申请7天的免费测试 token ，正式的运营方案也将很快出台，敬请期待！</p>
+
+<h2 id="关于-wechaty-puppet-service-workpro">关于 Wechaty Puppet Service WorkPro</h2>
+
+<p>WorkPro 是 <a href="http://rpachat.com/">RPAChat</a> 基于 wechaty-puppet-service 做的新 puppet service，RPAChat 来自美国硅谷，专注于通过 RPA 技术将 IM 软件变成机器人。RPAChat 正在为 P&amp;G 、 L’ORÉAL Paris 、 Swisse 、 POPMART 等知名品牌提供基于对话的营销云解决方案。</p>
+
+<p><img src="/assets/2022/12-introducing-workpro-puppet/rpachat-logo.webp" alt="rpachat-logo.webp" /></p>
+
+<p>WxWork作为我们上一代的企业微信 puppet service，已经服务了大家超过两年的时间。由于设计和架构的原因， WxWork 存在一些无法解决的缺陷，例如：</p>
+
+<ul>
+  <li>CPU 和内存占用巨大</li>
+  <li>当收到企微官方群发时，系统需要花费数小时来处理消息，导致无法使用</li>
+  <li>当扫码登录时，会花很长时间来同步历史消息</li>
+</ul>
+
+<p>WorkPro 利用全新设计的架构彻底解决了以上问题，带来了效率与性能的巨大提升。他还包含了许多新功能，其中一些在社区版的 Wechaty 上还无法支持。我们正在积极的推动这些功能合并入社区分支。</p>
+
+<h2 id="关于-wechaty-的版本">关于 Wechaty 的版本</h2>
+
+<p>WorkPro 由于支持了群公告事件等新事件，目前与社区版的 Wechaty 兼容存在一些问题，这会很快修复。详情请参考 <a href="https://github.com/wechaty/puppet-service/issues/216">issue 216</a> 。
+WorkPro 的架构是直接根据 wechaty-grpc 的相关功能，对齐的是 wechaty-grpc 的最新版，对于 deprecated 的功能未做全面兼容，因此对于 wechaty 0.x 的兼容性无法保证。 Wechaty 1.x 已经发布相当长的时间，建议使用最新版本的 Wechaty</p>
+
+<h2 id="如何申请试用">如何申请试用</h2>
+
+<p>对于这个 puppet 服务感兴趣的朋友，我们提供7天的免费试用 token ，请用微信或企微扫码添加客服咨询。
+<img src="/assets/2022/12-introducing-workpro-puppet/qrcode.webp" alt="qrcode.webp" /></p>
+
+<h2 id="workpro-getting-started">WorkPro Getting-Started</h2>
+
+<p>非常傻瓜的快速上手教程：</p>
+
+<p>使用官方的实例仓库:  <a href="https://github.com/wechaty/getting-started">Wechaty getting-started 项目</a> 。推荐直接使用 <a href="https://github.com/codespaces/new?hide_repo_select=true&amp;ref=main&amp;repo=78732688">Github Codespace</a>。当然也可以选择将 <a href="https://github.com/wechaty/getting-started">Wechaty getting-started 项目</a> 克隆到本地在本地运行，</p>
+
+<ul>
+  <li>
+    <p>使用 Codespace 运行</p>
+
+    <ol>
+      <li>点击 <a href="https://github.com/codespaces/new?hide_repo_select=true&amp;ref=main&amp;repo=78732688">Github Codespace</a> ，再点击 <code class="language-plaintext highlighter-rouge">Create Codespace</code> 。然后稍作等待，配置服务会自动安装好依赖。</li>
+      <li>
+        <p>设置环境变量。目前我们尚不支持 TLS 链接。详情请参考 : <a href="https://github.com/wechaty/puppet-service/issues/160">https://github.com/wechaty/puppet-service/issues/160</a></p>
+
+        <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">export </span><span class="nv">WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT</span><span class="o">=</span><span class="nb">true</span>
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p>修改 <code class="language-plaintext highlighter-rouge">examples/ding-dong-bot.ts</code> 。这一文件应该已经自动打开了。将 73-76 行改为如下代码</p>
+
+        <div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nx">puppet</span><span class="p">:</span> <span class="dl">'</span><span class="s1">wechaty-puppet-service</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// WorkPro 是一种 puppet-service ，因此这里应该填写 'wechaty-puppet-service' 而不是 'wechaty-puppet-workpro'</span>
+ <span class="nx">puppetOptions</span><span class="p">:</span> <span class="p">{</span>
+   <span class="nl">token</span><span class="p">:</span> <span class="dl">'</span><span class="s1">xxx</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// 将你的 token 填写在此，它应该形式类似于 'puppet_workpro_xxxxxx'</span>
+ <span class="p">}</span>
+</code></pre></div>        </div>
+      </li>
+      <li>使用 <code class="language-plaintext highlighter-rouge">npm start</code> 启动 bot ，你应该能看见二维码出现在你的终端中。</li>
+    </ol>
+  </li>
+  <li>
+    <p>克隆到本地运行</p>
+
+    <ol>
+      <li>
+        <p>安装依赖，确保你安装了 node 16 或以上，然后运行</p>
+
+        <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> npm <span class="nb">install </span>cross-env <span class="nt">-g</span>
+ npm <span class="nb">install</span>
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p>设置环境变量。目前我们尚不支持 TLS 链接。详情请参考 : <a href="https://github.com/wechaty/puppet-service/issues/160">https://github.com/wechaty/puppet-service/issues/160</a></p>
+
+        <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">export </span><span class="nv">WECHATY_PUPPET_SERVICE_NO_TLS_INSECURE_CLIENT</span><span class="o">=</span><span class="nb">true</span>
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p>打开 <code class="language-plaintext highlighter-rouge">examples/ding-dong-bot.ts</code> 。将 73-76 行改为如下代码</p>
+
+        <div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nx">puppet</span><span class="p">:</span> <span class="dl">'</span><span class="s1">wechaty-puppet-service</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// WorkPro 是一种 puppet-service ，因此这里应该填写 'wechaty-puppet-service' 而不是 'wechaty-puppet-workpro'</span>
+ <span class="nx">puppetOptions</span><span class="p">:</span> <span class="p">{</span>
+   <span class="nl">token</span><span class="p">:</span> <span class="dl">'</span><span class="s1">xxx</span><span class="dl">'</span><span class="p">,</span> <span class="c1">// 将你的 token 填写在此，它应该形式类似于 'puppet_workpro_xxxxxx'</span>
+ <span class="p">}</span>
+</code></pre></div>        </div>
+      </li>
+      <li>
+        <p>使用 <code class="language-plaintext highlighter-rouge">npm start</code> 启动 bot ，你应该能看见二维码出现在你的终端中。</p>
+      </li>
+    </ol>
+  </li>
+</ul>
+
+<h2 id="workpro-与-wxwork-的对比">WorkPro 与 WxWork 的对比</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>功能</th>
+      <th>WorkPro</th>
+      <th>WxWork</th>
+      <th>备注</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><消息></消息></td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>文本消息</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>图片消息</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>视频消息</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>文件消息</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>表情消息</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>表情包消息</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>语音消息</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>小程序消息</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>图文链接消息</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>名片消息</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>位置消息</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td>依赖体验版 Wechaty</td>
+    </tr>
+    <tr>
+      <td>引用消息</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td>依赖体验版 Wechaty</td>
+    </tr>
+    <tr>
+      <td>视频号消息</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td>依赖体验版 Wechaty</td>
+    </tr>
+    <tr>
+      <td><群></群></td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>创建群聊</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>设置群公告</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>获取群公告</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>群二维码</td>
+      <td>❌</td>
+      <td>❌</td>
+      <td>在计划中</td>
+    </tr>
+    <tr>
+      <td>拉人进群</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>接受群邀请</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>踢人出群</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>退出群聊</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>修改群名</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>入群事件</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td>WxWork 仅限群主， WorkPro 无限制</td>
+    </tr>
+    <tr>
+      <td>离群事件</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td>WxWork 仅限群主， WorkPro 无限制</td>
+    </tr>
+    <tr>
+      <td>群名称事件</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>@群成员</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>群成员列表</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>群详情</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>群公告变更事件</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td>依赖体验版 Wechaty</td>
+    </tr>
+    <tr>
+      <td><联系人></联系人></td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>修改备注</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>添加好友</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>通过好友</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>好友列表</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>好友详情</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>删除/被删除事件</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>好友标签</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td>依赖体验版 Wechaty</td>
+    </tr>
+    <tr>
+      <td>好友标签添加/删除事件</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td>依赖体验版 Wechaty</td>
+    </tr>
+    <tr>
+      <td>标签添加/删除/修改事件</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td>依赖体验版 Wechaty</td>
+    </tr>
+    <tr>
+      <td><其他></其他></td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>登录事件</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>扫码状态</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>登出事件</td>
+      <td>✅</td>
+      <td>✅</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>主动退出登录</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>发朋友圈</td>
+      <td>✅</td>
+      <td>❌</td>
+      <td>依赖体验版 Wechaty</td>
+    </tr>
+  </tbody>
+</table>]]></content><author><name>wang-nan</name></author><category term="announcement" /><category term="news" /><category term="puppet-service" /><category term="puppet-provider" /><category term="workpro" /><summary type="html"><![CDATA[经过长期的筹备与开发， WxWork 的继任者 WorkPro 作为 Wechaty 社区新的 Puppet Service 如今正式进入 beta 测试阶段了！欢迎社区的小伙伴申请7天的免费测试 token ，正式的运营方案也将很快出台，敬请期待！]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wechaty.js.org/assets/2022/12-introducing-workpro-puppet/wecom.webp" /><media:content medium="image" url="https://wechaty.js.org/assets/2022/12-introducing-workpro-puppet/wecom.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">5分钟把ChatGPT装进微信里</title><link href="https://wechaty.js.org/2022/12/07/play-chatgpt-with-wechaty/" rel="alternate" type="text/html" title="5分钟把ChatGPT装进微信里" /><published>2022-12-07T00:00:00+00:00</published><updated>2022-12-07T00:00:00+00:00</updated><id>https://wechaty.js.org/2022/12/07/play-chatgpt-with-wechaty</id><content type="html" xml:base="https://wechaty.js.org/2022/12/07/play-chatgpt-with-wechaty/"><![CDATA[<p>基于wechaty创建一个自己的ChatGPT机器人</p>
+
+<h2 id="背景">背景</h2>
+
+<h3 id="chatgpt是什么">ChatGPT是什么</h3>
+
+<p>这几天我的朋友圈被ChatGPT刷屏，如果你还不知道那就赶紧上网搜一下吧。</p>
+
+<p>官方介绍：<a href="https://openai.com/blog/chatgpt/">https://openai.com/blog/chatgpt/</a></p>
+
+<h3 id="chatgpt能干什么">ChatGPT能干什么</h3>
+
+<p>可以砍价，可以写文章，可以写代码，可以…</p>
+
+<p>更多好玩的场景等你探索</p>
+
+<p><img src="/assets/2022/12-play-chatgpt-with-wechaty/634.webp" alt="image.png" />
+<img src="/assets/2022/12-play-chatgpt-with-wechaty/636.webp" alt="image.png" /></p>
+
+<h3 id="uos-web协议复活">UOS web协议复活</h3>
+
+<p><code class="language-plaintext highlighter-rouge">wechaty-puppet-wechat 1.18.4</code>版本可以免费使用了</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install </span>wechaty-puppet-wechat@latest <span class="nt">--save</span>
+</code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const bot <span class="o">=</span> WechatyBuilder.build<span class="o">({</span>
+    name: <span class="s1">'puppet-wechat'</span>,
+    puppetOptions: <span class="o">{</span>
+      uos: <span class="nb">true</span>  // 开启uos协议
+    <span class="o">}</span>,
+    puppet: <span class="s1">'wechaty-puppet-wechat'</span>,
+<span class="o">})</span>
+</code></pre></div></div>
+
+<h2 id="获取chatgpt-session_token">获取ChatGPT SESSION_TOKEN</h2>
+
+<h3 id="注册chatgpt">注册ChatGPT</h3>
+
+<p>注册地址: <a href="https://chat.openai.com/chat">https://chat.openai.com/chat</a></p>
+
+<p>在国内注册ChatGPT账号稍微有点门槛</p>
+
+<ol>
+  <li>需要有一个国外的梯子（香港的不行）</li>
+  <li>需要国外手机号，可以使用<a href="https://sms-activate.org/cn">https://sms-activate.org/cn</a></li>
+</ol>
+
+<p><img src="/assets/2022/12-play-chatgpt-with-wechaty/637.webp" alt="image.png" /></p>
+
+<p>国内注册教程: <a href="https://juejin.cn/post/7173447848292253704">https://juejin.cn/post/7173447848292253704</a></p>
+
+<h3 id="登录chatgpt获取session_token">登录ChatGPT获取SESSION_TOKEN</h3>
+
+<ul>
+  <li>打开网页: <a href="https://chat.openai.com/chat">https://chat.openai.com/chat</a></li>
+  <li>打开开发者工具-&gt;应用-&gt;Cookie</li>
+  <li>拷贝<code class="language-plaintext highlighter-rouge">__Secure-next-auth.session-token</code>的值
+<img src="/assets/2022/12-play-chatgpt-with-wechaty/image.webp" alt="image.png" /></li>
+</ul>
+
+<h2 id="使用chatgpt-api">使用chatgpt-api</h2>
+
+<p>github地址: <a href="https://github.com/transitive-bullshit/chatgpt-api">https://github.com/transitive-bullshit/chatgpt-api</a></p>
+
+<h3 id="使用方法">使用方法</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install </span>chatgpt
+</code></pre></div></div>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">ChatGPTAPI</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">chatgpt</span><span class="dl">'</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nf">example</span><span class="p">()</span> <span class="p">{</span>
+  <span class="c1">// sessionToken is required; see below for details</span>
+  <span class="kd">const</span> <span class="nx">api</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ChatGPTAPI</span><span class="p">({</span>
+    <span class="na">sessionToken</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SESSION_TOKEN</span>
+  <span class="p">})</span>
+
+  <span class="c1">// ensure the API is properly authenticated</span>
+  <span class="k">await</span> <span class="nx">api</span><span class="p">.</span><span class="nf">ensureAuth</span><span class="p">()</span>
+
+  <span class="c1">// send a message and wait for the response</span>
+  <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">api</span><span class="p">.</span><span class="nf">sendMessage</span><span class="p">(</span>
+    <span class="dl">'</span><span class="s1">Write a python version of bubble sort.
+  )
+
+  // response is a markdown-formatted string
+  console.log(response)
+}
+</span></code></pre></div></div>
+
+<h2 id="集成chatgpt-api和wechaty">集成chatgpt-api和wechaty</h2>
+
+<p>直接上代码：</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">WechatyBuilder</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">wechaty</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">qrcodeTerminal</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">qrcode-terminal</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="p">{</span> <span class="nx">ChatGPTAPI</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">chatgpt</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">let</span> <span class="nx">sessionToken</span> <span class="o">=</span> <span class="dl">''</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">api</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ChatGPTAPI</span><span class="p">({</span> <span class="na">sessionToken</span><span class="p">:</span> <span class="nx">sessionToken</span> <span class="o">||</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SESSION_TOKEN</span> <span class="p">});</span>
+<span class="k">await</span> <span class="nx">api</span><span class="p">.</span><span class="nf">ensureAuth</span><span class="p">();</span>
+<span class="kd">const</span> <span class="nx">wechaty</span> <span class="o">=</span> <span class="nx">WechatyBuilder</span><span class="p">.</span><span class="nf">build</span><span class="p">({</span>
+  <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">wechaty-chatgpt</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">puppet</span><span class="p">:</span> <span class="dl">'</span><span class="s1">wechaty-puppet-wechat</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">puppetOptions</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">uos</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="p">},</span>
+<span class="p">});</span>
+<span class="nx">wechaty</span>
+  <span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">scan</span><span class="dl">'</span><span class="p">,</span> <span class="nf">async </span><span class="p">(</span><span class="nx">qrcode</span><span class="p">,</span> <span class="nx">status</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">qrcodeTerminal</span><span class="p">.</span><span class="nf">generate</span><span class="p">(</span><span class="nx">qrcode</span><span class="p">);</span> <span class="c1">// 在console端显示二维码</span>
+    <span class="kd">const</span> <span class="nx">qrcodeImageUrl</span> <span class="o">=</span> <span class="p">[</span><span class="dl">'</span><span class="s1">https://api.qrserver.com/v1/create-qr-code/?data=</span><span class="dl">'</span><span class="p">,</span> <span class="nf">encodeURIComponent</span><span class="p">(</span><span class="nx">qrcode</span><span class="p">)].</span><span class="nf">join</span><span class="p">(</span><span class="dl">''</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">qrcodeImageUrl</span><span class="p">);</span>
+  <span class="p">})</span>
+  <span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">login</span><span class="dl">'</span><span class="p">,</span> <span class="nx">user</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="s2">`User </span><span class="p">${</span><span class="nx">user</span><span class="p">}</span><span class="s2"> logged in`</span><span class="p">))</span>
+  <span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">logout</span><span class="dl">'</span><span class="p">,</span> <span class="nx">user</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="s2">`User </span><span class="p">${</span><span class="nx">user</span><span class="p">}</span><span class="s2"> has logged out`</span><span class="p">))</span>
+  <span class="p">.</span><span class="nf">on</span><span class="p">(</span><span class="dl">'</span><span class="s1">message</span><span class="dl">'</span><span class="p">,</span> <span class="k">async</span> <span class="nx">message</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">contact</span> <span class="o">=</span> <span class="nx">message</span><span class="p">.</span><span class="nf">talker</span><span class="p">();</span>
+    <span class="kd">const</span> <span class="nx">content</span> <span class="o">=</span> <span class="nx">message</span><span class="p">.</span><span class="nf">text</span><span class="p">();</span>
+    <span class="kd">const</span> <span class="nx">isText</span> <span class="o">=</span> <span class="nx">message</span><span class="p">.</span><span class="nf">type</span><span class="p">()</span> <span class="o">===</span> <span class="nx">wechaty</span><span class="p">.</span><span class="nx">Message</span><span class="p">.</span><span class="nx">Type</span><span class="p">.</span><span class="nx">Text</span><span class="p">;</span>
+    <span class="nf">if </span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="nf">self</span><span class="p">()</span> <span class="o">||</span> <span class="o">!</span><span class="nx">isText</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="s2">`contact: </span><span class="p">${</span><span class="nx">contact</span><span class="p">}</span><span class="s2"> content: </span><span class="p">${</span><span class="nx">content</span><span class="p">}</span><span class="s2">`</span><span class="p">);</span>
+    <span class="nf">if </span><span class="p">(</span><span class="nx">content</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">ding</span><span class="dl">'</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">await</span> <span class="nx">contact</span><span class="p">.</span><span class="nf">say</span><span class="p">(</span><span class="dl">'</span><span class="s1">dong</span><span class="dl">'</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="nf">if </span><span class="p">(</span><span class="nx">content</span><span class="p">.</span><span class="nf">startsWith</span><span class="p">(</span><span class="dl">'</span><span class="s1">/c </span><span class="dl">'</span><span class="p">))</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">api</span><span class="p">.</span><span class="nf">sendMessage</span><span class="p">(</span><span class="nx">content</span><span class="p">.</span><span class="nf">replace</span><span class="p">(</span><span class="dl">'</span><span class="s1">/c </span><span class="dl">'</span><span class="p">,</span> <span class="dl">''</span><span class="p">));</span>
+      <span class="k">try</span> <span class="p">{</span>
+        <span class="k">await</span> <span class="nx">contact</span><span class="p">.</span><span class="nf">say</span><span class="p">(</span><span class="nx">response</span><span class="p">);</span>
+      <span class="p">}</span> <span class="nf">catch </span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">});</span>
+<span class="nx">wechaty</span>
+  <span class="p">.</span><span class="nf">start</span><span class="p">()</span>
+  <span class="p">.</span><span class="nf">then</span><span class="p">(()</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">Start to log in wechat...</span><span class="dl">'</span><span class="p">))</span>
+  <span class="p">.</span><span class="nf">catch</span><span class="p">(</span><span class="nx">e</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="nx">e</span><span class="p">));</span>
+</code></pre></div></div>
+
+<h3 id="效果">效果</h3>
+
+<p><img src="https://raw.githubusercontent.com/sunshanpeng/wechaty-chatgpt/main/media/screenshot-20221207-131138.png" alt="image.png" /></p>
+
+<h2 id="总结">总结</h2>
+
+<p>感谢wechaty和chatgpt-api，让我们能够很方便的开发自己的机器人，更多玩法等你探索</p>
+
+<p>项目地址：<a href="https://github.com/sunshanpeng/wechaty-chatgpt">github sunshanpeng/wechaty-chatgpt</a>，欢迎给我一个 Star⭐</p>]]></content><author><name>sunshanpeng</name></author><category term="article" /><category term="chatgpt" /><category term="wechaty-puppet-wechat" /><summary type="html"><![CDATA[基于wechaty创建一个自己的ChatGPT机器人]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wechaty.js.org/assets/2022/12-play-chatgpt-with-wechaty/636.webp" /><media:content medium="image" url="https://wechaty.js.org/assets/2022/12-play-chatgpt-with-wechaty/636.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">基于 Wechaty 实现高校招生宣传小助手的实践</title><link href="https://wechaty.js.org/2022/09/27/wechaty-university-admission-helper/" rel="alternate" type="text/html" title="基于 Wechaty 实现高校招生宣传小助手的实践" /><published>2022-09-27T00:00:00+00:00</published><updated>2022-09-27T00:00:00+00:00</updated><id>https://wechaty.js.org/2022/09/27/wechaty-university-admission-helper</id><content type="html" xml:base="https://wechaty.js.org/2022/09/27/wechaty-university-admission-helper/"><![CDATA[<p>一个能够智能识别关键词并自动回复招生信息的机器人，基于 Wechaty, Node.js 实现。</p>
+
+<h2 id="背景">背景</h2>
+
+<p>这是一篇迟到了三个月的文章，此时终于有机会能够补上。通过这篇文章，记录一下遇到的一些问题与解决方案。</p>
+
+<p>三个月前的六月，正值高考放榜，各大高校都在进行火热的招生宣讲。随着咨询的人越来越多，招生宣传的拉的微信群也越来越多，于是突发奇想，反正大家问的问题无非就是今年招多少人，去年分数线如何，学校环境如何，专业如何等等，那这些重复性的回答工作为何不交给机器人来做呢？</p>
+
+<h2 id="实现">实现</h2>
+
+<p>由于当时正好是期末周，于是草草实现了一个基于关键词的自动回复功能。通过分析大家咨询的问题，我把每个人发的信息分为两个部分：和招生相关的词汇、疑问词汇。当这两种词汇同时出现时，基本可以断定是家长或者学生正在咨询招生相关问题。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">export</span> <span class="kd">const</span> <span class="nx">ADMISSION_WORDS</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s2">`计划`</span><span class="p">,</span>
+  <span class="s2">`分数`</span><span class="p">,</span>
+  <span class="s2">`录取`</span><span class="p">,</span>
+  <span class="s2">`人数`</span><span class="p">,</span>
+  <span class="s2">`招`</span><span class="p">,</span>
+  <span class="s2">`专业`</span><span class="p">,</span>
+<span class="p">];</span>
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">QUESTIONS_WORDS</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s2">`请问`</span><span class="p">,</span>
+  <span class="s2">`吗`</span><span class="p">,</span>
+  <span class="s2">`呢`</span><span class="p">,</span>
+  <span class="s2">`问`</span><span class="p">,</span>
+  <span class="s2">`多少`</span><span class="p">,</span>
+<span class="p">];</span>
+</code></pre></div></div>
+
+<p>这两个数组经过后期反复的调整，最终变为上面这样。</p>
+
+<p>再设置一下固定的回复语句，一个自动回复的机器人就这么完成了。</p>
+
+<h2 id="问题">问题</h2>
+
+<p>用了一段时间之后，问题层出不穷。</p>
+
+<h3 id="发送图片">发送图片</h3>
+
+<p>首先，如果要将招生信息全部结合到文字中，那么最终回复的文字会相当的长，会造成刷屏的效果，所以必须要实现图片的发送功能，把部分信息通过图片发送。</p>
+
+<p>当时使用的是 <code class="language-plaintext highlighter-rouge">wechaty-puppet-xp</code>，而 <code class="language-plaintext highlighter-rouge">puppet-xp</code> 的图片发送接口并不完善，通过阅读源代码发现只支持通过 URL 发送图片，遂将图片上传到图床，然后获取网址再发送。</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">img</span> <span class="o">=</span> <span class="nx">FileBox</span><span class="p">.</span><span class="nf">fromUrl</span><span class="p">(</span><span class="nx">reply</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>上面的 <code class="language-plaintext highlighter-rouge">img</code> 就可以通过 <code class="language-plaintext highlighter-rouge">Wechaty</code> 的 <code class="language-plaintext highlighter-rouge">say()</code> 接口直接进行发送了。</p>
+
+<p>效果如下：
+<img src="/assets/2022/09-wechaty-university-admission-helper/question_and_answer.webp" alt="问答示例" /></p>
+
+<h3 id="误判">误判</h3>
+
+<p>当招生组老师发送招生信息时，发现机器人也会自动回复。如下图所示。
+<img src="/assets/2022/09-wechaty-university-admission-helper/error.webp" alt="误判了招生组老师的信息" /></p>
+
+<p>猜想是同时满足了刚才说的两种关键词的原因，于是调整了关键词词库，并添加了过滤掉招生组老师与本校学长学姐的消息，通过微信号识别特定的人，若满足条件则不发送招生信息。</p>
+
+<h3 id="非招生群">非招生群</h3>
+
+<p>由于我的机器人同时挂在了好几个群里，会出现不是招生宣传的微信群也会发送招生宣传的消息。于是加上了命令控制是否在本群发送招生信息的开关（默认不开启）。
+<img src="/assets/2022/09-wechaty-university-admission-helper/command.webp" alt="命令控制示例" /></p>
+
+<p>命令中包含学校信息，是因为一开始实现是基于可以为多个学校同时提供服务的想法，每个群可以独立发送不同高校的招生信息。</p>
+
+<h3 id="定时发送">定时发送</h3>
+
+<p>由于微信群有新成员不可查看历史信息的限制，招生组老师让我加上了一个定时发送的功能，通过定时发送招生信息，让后面加入微信群的成员可以及时获取最新消息。
+<img src="/assets/2022/09-wechaty-university-admission-helper/timing.webp" alt="定时发送" /></p>
+
+<h3 id="扰民">扰民</h3>
+
+<p>由于机器人是对每一条消息进行识别，所以会导致如果想要咨询的人连续发了多条消息，机器人对每一条消息都会回复一串长长的文字，于是又加上了间隔一段时间再发送的机制，如果 10 分钟内识别到连续两条需要回复的消息，那么第二条消息将不会进行回复。</p>
+
+<h2 id="总结">总结</h2>
+
+<p>有了机器人的帮助，还是给招生老师的工作减轻了不少，不过这个功能仍然存在许多问题，需要后续继续加以改进。</p>
+
+<p>项目地址：<a href="https://github.com/ligen131/Sunbot">github ligen131/Sunbot</a>，欢迎给我一个 Star⭐</p>
+
+<p>除了招生小助手之外，还实现了不少好玩的功能，比如之前很火的 wordle 游戏，词云功能等等。或许会在另一篇文章中讲到。
+<img src="/assets/2022/09-wechaty-university-admission-helper/wordle.webp" alt="wordle 游戏" /></p>
+
+<blockquote>
+  <p>作者: <a href="https://ligen131.com">ligen131</a>，生命不息，折腾不止。</p>
+</blockquote>]]></content><author><name>ligen131</name></author><category term="article" /><category term="bot" /><category term="后端" /><category term="node.js" /><category term="typescript" /><category term="高校招生" /><summary type="html"><![CDATA[一个能够智能识别关键词并自动回复招生信息的机器人，基于 Wechaty, Node.js 实现。]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wechaty.js.org/assets/2022/09-wechaty-university-admission-helper/cover.webp" /><media:content medium="image" url="https://wechaty.js.org/assets/2022/09-wechaty-university-admission-helper/cover.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">免费UOS协议快速接入可视化配置面板</title><link href="https://wechaty.js.org/2022/07/26/free-uos-ui/" rel="alternate" type="text/html" title="免费UOS协议快速接入可视化配置面板" /><published>2022-07-26T00:00:00+00:00</published><updated>2022-07-26T00:00:00+00:00</updated><id>https://wechaty.js.org/2022/07/26/free-uos-ui</id><content type="html" xml:base="https://wechaty.js.org/2022/07/26/free-uos-ui/"><![CDATA[<p>经历过UOS web协议的重放荣光，又经过一段时间的封禁，又有大神把UOS web协议救回来了。免费的快乐又重新回来了，不是吗?</p>
+
+<h2 id="背景">背景</h2>
+
+<p>在闲逛各大平台学习(摸鱼)的时候，突然发现有群里有人发<code class="language-plaintext highlighter-rouge">python</code>的<code class="language-plaintext highlighter-rouge">ichat</code>可以使用uos协议了，我刚开始还很纳闷，uos不是被封一年多了吗，怎么会还可以用，抱着试试看
+的态度问了一下，说有大佬已经研究破解了最新的解禁方式，并且还友好的发了一份说明。带着这份好奇，我测试了一番，果然已经可以登录了。那还说什么，赶紧去提个PR去修
+复一下看看。研究了一个晚上按照<code class="language-plaintext highlighter-rouge">ichat</code>的方式去修改各种参数，但是最后才发现，其实并不需要，<code class="language-plaintext highlighter-rouge">puppet-wechat</code>本身就是hook web协议的，不需要各种参数构造
+直接，修改<code class="language-plaintext highlighter-rouge">expam</code>加上修改登录地址即可，我这暴脾气啊…</p>
+
+<p>具体修改代码参考：<a href="https://github.com/wechaty/puppet-wechat/pull/206">uos make puppet-wechat great again</a></p>
+
+<p>对于<code class="language-plaintext highlighter-rouge">ichat</code>uos修复方案感兴趣的可以查看此文档（此文档非本人编写，也是其他大佬提供的）：<a href="https://docs.google.com/document/d/124zjP9K3URbUHQ2rC0LMQxp_PoMQ0G-KOYFFTYeiYVA/edit?usp=sharing">https://docs.google.com/document/d/124zjP9K3URbUHQ2rC0LMQxp_PoMQ0G-KOYFFTYeiYVA/edit?usp=sharing</a></p>
+
+<h2 id="如何开启uos协议登录">如何开启uos协议登录</h2>
+
+<p>默认的web协议是没有开启uos协议登录的，需要自行配置一下，旧版的<code class="language-plaintext highlighter-rouge">wechaty-puppet-wechat</code>是不支持，版本必须<code class="language-plaintext highlighter-rouge">&gt;=1.18.4</code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install </span>wechaty-puppet-wechat@latest <span class="nt">--save</span>
+</code></pre></div></div>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">bot</span> <span class="o">=</span> <span class="nx">WechatyBuilder</span><span class="p">.</span><span class="nf">build</span><span class="p">({</span>
+    <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">puppet-wechat</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">puppetOptions</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">uos</span><span class="p">:</span> <span class="kc">true</span>  <span class="c1">// 开启uos协议</span>
+    <span class="p">},</span>
+    <span class="na">puppet</span><span class="p">:</span> <span class="dl">'</span><span class="s1">wechaty-puppet-wechat</span><span class="dl">'</span><span class="p">,</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h3 id="报错无法登录">报错无法登录？</h3>
+
+<p>通常可能是由于你账号的原因，因为我已经测试了多个不能登录网页版微信的账户，都已经可以成功登陆。如果看不出错误，可以下载这个chrome插件，安装后，直接在浏览器访问<a href="https://wx.qq.com/?target=t">https://wx.qq.com/?target=t</a> 先测试一下，看看有什么报错</p>
+
+<p>谷歌浏览器插件地址：<a href="https://github.com/leochen-g/wechrome">https://github.com/leochen-g/wechrome</a></p>
+
+<h2 id="可视化配置面板">可视化配置面板</h2>
+
+<p><img src="/assets/2022/07-free-uos-ui/1.webp" alt="home" /></p>
+
+<p><img src="/assets/2022/07-free-uos-ui/2.webp" alt="main" /></p>
+
+<p><img src="/assets/2022/07-free-uos-ui/3.webp" alt="news" /></p>
+
+<h3 id="功能介绍">功能介绍</h3>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />微信每日说,定时给女朋友发送每日天气提醒，以及每日一句</li>
+</ul>
+
+<p>定时提醒</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />当天定时提醒 例：”提醒 我 18:00 下班了，记得带好随身物品”</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />每天定时提醒 例：”提醒 我 每天 18:00 下班了，记得带好随身物品”</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />指定日期提醒 例：”提醒 我 2019-05-10 8:00 还有 7 天是女朋友生日了，准备一下”</li>
+</ul>
+
+<p>智能机器人</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />天行机器人</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />图灵机器人</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />腾讯闲聊机器人</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />微信对话开放平台</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />更多</li>
+</ul>
+
+<p>群定时任务</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />群新闻定时发送</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />群消息定时发送</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />更多功能等你来 pr</li>
+</ul>
+
+<p>关键词</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />关键词加好友</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />关键词加群</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />关键词回复</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />关键词事件
+    <ul class="task-list">
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />天气查询 例：”上海天气”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />垃圾分类 例：”?香蕉皮”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />名人名言 例： “名人名言”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />老黄历查询 例： “黄历 2019-6-13”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />姓氏起源 例： “姓陈”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />星座运势 例： “*双子座”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />神回复 例： “神回复”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />获取表情包 例： “表情包你好坏”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />获取美女图 例： “美女图”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />群合影 例： “群合影”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />牛年头像 例： “牛气冲天”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />国旗头像 例： “我要国旗”</li>
+      <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />更多待你发现</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />进群自动欢迎</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />加好友自动回复</li>
+</ul>
+
+<p>自动更新配置文件，无需重启</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />默认给机器人发送 ‘更新’ 触发拉取新配置文件操作，可在面板<code class="language-plaintext highlighter-rouge">小助手配置-&gt;关键词回复-&gt;关键词事件</code>进行修改关键词</li>
+</ul>
+
+<p>特色功能</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />群合影</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />主动发送消息</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />主动更新配置</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />主动同步好友和群列表</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />多群消息同步</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />openapi请求</li>
+</ul>
+
+<h2 id="提前准备">提前准备</h2>
+
+<h3 id="注册智能微秘书管理账号">注册智能微秘书管理账号</h3>
+
+<ol>
+  <li>
+    <p>注册：<a href="http://wechat.aibotk.com/signup?from=wechatyblog">智能微秘书</a></p>
+  </li>
+  <li>
+    <p>初始化配置文件<code class="language-plaintext highlighter-rouge">小助手配置-&gt;基础配置</code>，修改后保存</p>
+  </li>
+  <li>
+    <p>个人中心获取<code class="language-plaintext highlighter-rouge">APIKEY</code>和<code class="language-plaintext highlighter-rouge">APISECRET</code>，后续配置用到</p>
+  </li>
+</ol>
+
+<h3 id="注册天行数据账号">注册天行数据账号</h3>
+
+<p>由于本项目大部分定时资讯和一些天气接口来自于天行数据，所以需要提前准备好天行数据的账号，同时申请好相关接口的权限</p>
+
+<p>1、注册: <a href="https://www.tianapi.com/source/865c0f3bfa">天行数据</a></p>
+
+<p>2、申请接口权限</p>
+
+<p>必选接口</p>
+
+<ul>
+  <li><a href="https://www.tianapi.com/apiview/47">天行机器人</a></li>
+  <li><a href="https://www.tianapi.com/apiview/72">天气</a></li>
+  <li><a href="https://www.tianapi.com/apiview/51">新闻</a></li>
+  <li><a href="https://www.tianapi.com/apiview/97">垃圾分类</a></li>
+</ul>
+
+<p>可选接口（如果想使用相应的功能还是必须申请的），但是如果默认使用了天行机器人，以下功能接口无需申请也可以，机器人会直接返回对应信息</p>
+
+<ul>
+  <li><a href="https://www.tianapi.com/apiview/80">土味情话</a></li>
+  <li><a href="https://www.tianapi.com/apiview/92">名人名言</a></li>
+  <li><a href="https://www.tianapi.com/apiview/78">星座运势</a></li>
+  <li><a href="https://www.tianapi.com/apiview/94">姓氏起源</a></li>
+  <li><a href="https://www.tianapi.com/apiview/54">顺口溜</a></li>
+  <li><a href="https://www.tianapi.com/apiview/45">老黄历</a></li>
+  <li><a href="https://www.tianapi.com/apiview/39">神回复</a></li>
+  <li><a href="https://www.tianapi.com/apiview/38">歇后语</a></li>
+  <li><a href="https://www.tianapi.com/apiview/37">绕口令</a></li>
+  <li><a href="https://www.tianapi.com/apiview/169">疫情</a></li>
+  <li><a href="https://www.tianapi.com/apiview/36">网络取名</a></li>
+</ul>
+
+<h2 id="开始运行">开始运行</h2>
+
+<blockquote>
+  <p>环境node &gt; 16</p>
+</blockquote>
+
+<h3 id="step-1-安装">Step 1: 安装</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install </span>wechaty-web-panel@latest wechaty@latest <span class="nt">--save</span>
+</code></pre></div></div>
+
+<h3 id="step-2-创建机器人并配置插件的apikey和apisecret">Step 2: 创建机器人并配置插件的<code class="language-plaintext highlighter-rouge">apiKey</code>和<code class="language-plaintext highlighter-rouge">apiSecret</code></h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim mybot.js
+
+const <span class="o">{</span>WechatyBuilder<span class="o">}</span> <span class="o">=</span> require<span class="o">(</span><span class="s1">'wechaty'</span><span class="o">)</span>
+const WechatyWebPanelPlugin <span class="o">=</span> require<span class="o">(</span><span class="s1">'../src/index'</span><span class="o">)</span>
+
+const name <span class="o">=</span> <span class="s1">'wechat-assistant'</span>
+
+const bot <span class="o">=</span> WechatyBuilder.build<span class="o">({</span>
+    name, // generate xxxx.memory-card.json and save login data <span class="k">for </span>the next login
+    puppet: <span class="s1">'wechaty-puppet-wechat'</span>,
+<span class="o">})</span>
+bot
+    .use<span class="o">(</span>WechatyWebPanelPlugin<span class="o">({</span>
+        apiKey: <span class="s1">'apiKey'</span>,
+        apiSecret: <span class="s1">'apiSecret'</span>
+    <span class="o">}))</span>
+    .start<span class="o">()</span>
+    .catch<span class="o">((</span>e<span class="o">)</span> <span class="o">=&gt;</span> console.error<span class="o">(</span>e<span class="o">))</span>
+
+</code></pre></div></div>
+
+<h3 id="step-3-运行">Step 3: 运行</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node mybot.js
+</code></pre></div></div>
+
+<h3 id="step-4-扫码进入">Step 4: 扫码进入</h3>
+
+<p>进入面板<code class="language-plaintext highlighter-rouge">小助手配置-&gt;登录状态</code>扫码登录，或直接扫码控制台二维码登录</p>
+
+<h3 id="直接拉取镜像推荐">直接拉取镜像（推荐）</h3>
+
+<p>由于群里经常反应会遇到各种环境问题，或者经常会卡住，所以本项目已经提前构建好发布到dockerhub了，直接pull就行了</p>
+
+<h4 id="step1-拉取镜像">step1： 拉取镜像</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+docker pull aibotk/wechat-assistant
+
+</code></pre></div></div>
+
+<h4 id="step2-启动docker">step2： 启动docker</h4>
+
+<p>以下两个命令自己选择一个执行就行，执行的时候会下载puppet，可能会比较慢，耐心等待一下即可</p>
+
+<p>1、请在项目根目录执行，这个命令是前台执行可以直接看到log日志的，但是没法关闭，只能销毁终端实例</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-e</span> <span class="nv">AIBOTK_KEY</span><span class="o">=</span><span class="s2">"微秘书apikey"</span> <span class="nt">-e</span> <span class="nv">AIBOTK_SECRET</span><span class="o">=</span><span class="s2">"微秘书apiSecret"</span> <span class="nt">--name</span><span class="o">=</span>wechatbot aibotk/wechat-assistant
+
+</code></pre></div></div>
+
+<p>2、这个命令可以在后台运行，多了一个<code class="language-plaintext highlighter-rouge">-d</code></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run <span class="nt">-d</span> <span class="nt">-e</span> <span class="nv">AIBOTK_KEY</span><span class="o">=</span><span class="s2">"微秘书apikey"</span> <span class="nt">-e</span> <span class="nv">AIBOTK_SECRET</span><span class="o">=</span><span class="s2">"微秘书apiSecret"</span> <span class="nt">--name</span><span class="o">=</span>wechatbot aibotk/wechat-assistant
+
+</code></pre></div></div>
+
+<p><a href="https://www.cnblogs.com/mydesky2012/p/11430394.html">如何查看docker日志</a></p>
+
+<h2 id="源码">源码</h2>
+
+<p>客户端所有实现的功能均已经开源：<a href="https://github.com/leochen-g/wechaty-web-panel">Wechaty-web-panel</a> ，欢迎star</p>
+
+<h2 id="其他协议">其他协议</h2>
+
+<ul>
+  <li>ipad协议对接可视化面板：<a href="https://github.com/leochen-g/wechat-assistant-pro-ipad">wechat-assistant-pro-ipad</a></li>
+  <li>5G消息对接可视化面板：<a href="https://github.com/leochen-g/walnut-aibot">walnut-aibot</a></li>
+  <li>xp协议对接可视化面板： <a href="http://wechat.aibotk.com/docs/faq">如何使用免费的 wechaty-puppet-xp 协议</a></li>
+</ul>
+
+<h3 id="其他插件">其他插件</h3>
+
+<ul>
+  <li><a href="https://github.com/leochen-g/wechaty-fanli">wechaty-fanli插件</a> ：基于wechaty实现的返利微信机器人，根据淘口令生成高佣转链接，并创建新的淘口令</li>
+  <li><a href="https://github.com/leochen-g/wechaty-face-cartoon">wechaty-face-cartoon</a> ：Wechaty 人像转换插件，让你的 Wechaty 机器人实现照片卡通化，年龄变化，性别变化等功能</li>
+  <li><a href="https://github.com/leochen-g/wechaty-dice-king">wechaty-dice-king</a> ：Wechaty 骰王卡牌抽取游戏插件，类似<a href="https://v2docs.kokona.tech/zh/latest/CookBook.html">骰娘</a> ,也可以在微信群实现玩狼人杀</li>
+</ul>]]></content><author><name>leochen-g</name></author><category term="talk" /><category term="code" /><category term="puppet-wechat" /><category term="web-protocol" /><summary type="html"><![CDATA[经历过UOS web协议的重放荣光，又经过一段时间的封禁，又有大神把UOS web协议救回来了。免费的快乐又重新回来了，不是吗?]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wechaty.js.org/assets/2022/07-free-uos-ui/wechaty-puppet-wechat.webp" /><media:content medium="image" url="https://wechaty.js.org/assets/2022/07-free-uos-ui/wechaty-puppet-wechat.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry><entry><title type="html">Wechaty community meetup: Office Hour, Feb 22th, 2022</title><link href="https://wechaty.js.org/2022/07/22/wechaty-office-hour/" rel="alternate" type="text/html" title="Wechaty community meetup: Office Hour, Feb 22th, 2022" /><published>2022-07-22T00:00:00+00:00</published><updated>2022-07-22T00:00:00+00:00</updated><id>https://wechaty.js.org/2022/07/22/wechaty-office-hour</id><content type="html" xml:base="https://wechaty.js.org/2022/07/22/wechaty-office-hour/"><![CDATA[<p>7月22日，周五，社区在线上举办了一个 Office Hour 的视频会议，由 <code class="language-plaintext highlighter-rouge">@Huan</code>，<code class="language-plaintext highlighter-rouge">@wj-Mcat</code>，<code class="language-plaintext highlighter-rouge">@Leo_chen</code> 共同讨论了一下社区中一些新项目的进展，并且相互提出了一些建议。</p>
+
+<p><strong>本篇文章是基于视频会议回放整理出来的内容</strong>，视频会议回放如下：</p>
+
+<div style="
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top:30px;
+    height:0;
+    overflow:hidden;
+">
+  <iframe src="https://www.youtube.com/embed/JAOhsyW937c" allowfullscreen="" webkitallowfullscreen="" frameborder="0" style="
+      position: absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+    ">
+</iframe>
+
+</div>
+
+<h2 id="与会者介绍">与会者介绍</h2>
+
+<p><a href="https://github.com/huan">@huan</a>, <a href="https://wechaty.js.org/contributors/huan">Huan LI</a>, Creator of Wechaty, Tencent TVP of Chatbot</p>
+
+<p><a href="https://github.com/wj-Mcat">@wj-Mcat</a>, Author of <a href="https://github.com/wechaty/python-wechaty">python-wechaty</a></p>
+
+<p><a href="https://github.com/leochen-g">@Leo_chen</a>: Author of <a href="https://github.com/leochen-g/wechaty-web-panel">Wechaty-web-panel</a></p>
+
+<h2 id="个人分享环节">个人分享环节</h2>
+
+<h3 id="leo_chen">Leo_chen</h3>
+
+<p>近期关注：</p>
+
+<ul>
+  <li>硬核桃社区5G消息套件 的 <a href="https://github.com/wechaty/puppet-walnut">puppet-walnut</a></li>
+  <li>硬核桃社区5G消息网关 的 <a href="https://github.com/leochen-g/puppet-walnut-gateway">puppet-walnut-gateway</a></li>
+  <li>关于适配市面支持http调用的IM接口</li>
+</ul>
+
+<h3 id="wj-mcat">wj-Mcat</h3>
+
+<p>近期关注：</p>
+
+<ul>
+  <li>Wechaty-ui的开发推进，实现Wechaty社区官方的UI插件管理中心</li>
+</ul>
+
+<h3 id="huan">huan</h3>
+
+<ul>
+  <li>回顾了最早时期Wechaty的愿景，具体文档可以参见<a href="https://docs.google.com/presentation/d/13oUOIEnzdLWO6KZWztD_pMuu22AQ3SIMjk2wp8f-f18/edit#slide=id.g194ee6e600_0_51">Wechaty 101</a></li>
+</ul>
+
+<h2 id="faq-meetup">FAQ Meetup</h2>
+
+<p>主要讲四块：</p>
+
+<ul>
+  <li>5G消息puppet模块的更替，需要和丁生和康嘉再进行一次讨论</li>
+  <li>关于Post Message 的扩展，可以支持更多的其他消息类型</li>
+  <li>关于实现engine-template去支持市面所有可以进行http或websocket的调用的协议</li>
+  <li>Wechaty-ui的设计模式及具体展现形式</li>
+</ul>
+
+<h2 id="suggestions">Suggestions</h2>
+
+<h3 id="wechaty-ui">Wechaty-ui：</h3>
+
+<ul>
+  <li>strongly suggests using Angular as a web framework because Angular will be used with the official Wechaty cloud service in the future</li>
+</ul>
+
+<h3 id="cqrs--ddd">CQRS &amp; DDD：</h3>
+
+<p>Event Driven Programming with Wechaty：</p>
+
+<ul>
+  <li><a href="https://wechaty.js.org/2022/03/17/event-driven-wechaty-cqrs/">Event Driven Wechaty-cqrs</a></li>
+  <li><a href="https://github.com/wechaty/cqrs">CQRS</a></li>
+</ul>
+
+<h2 id="future-wechaty-community-official-hour">Future Wechaty Community Official Hour</h2>
+
+<p><a href="https://calendly.com/huan/wechaty">https://calendly.com/huan/wechaty</a></p>]]></content><author><name>leochen-g</name></author><category term="talk" /><category term="wechaty-puppet-walnut" /><category term="wechaty-ui" /><category term="meetup" /><summary type="html"><![CDATA[7月22日，周五，社区在线上举办了一个 Office Hour 的视频会议，由 @Huan，@wj-Mcat，@Leo_chen 共同讨论了一下社区中一些新项目的进展，并且相互提出了一些建议。]]></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://wechaty.js.org/assets/2022/07-wechaty-office-hour/icon.webp" /><media:content medium="image" url="https://wechaty.js.org/assets/2022/07-wechaty-office-hour/icon.webp" xmlns:media="http://search.yahoo.com/mrss/" /></entry></feed>
